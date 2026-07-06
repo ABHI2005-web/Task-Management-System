@@ -1,61 +1,106 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-import sqlite3
+:root {
+    --primary: #4f46e5;
+    --background: #f3f4f6;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --border: #d1d5db;
+}
 
-app = Flask(__name__)
-app.secret_key = 'your_super_secret_session_key'
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
 
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    box-sizing: border-box;
+}
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        admin_id = request.form['admin_id']
-        password = request.form['password']
-        
-        conn = get_db_connection()
-        admin = conn.execute('SELECT * FROM admins WHERE admin_id = ? AND password = ?', 
-                             (admin_id, password)).fetchone()
-        conn.close()
-        
-        if admin:
-            session['admin_id'] = admin['admin_id']
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid Admin ID or Password', 'error')
-            
-    return render_template('login.html')
+.card {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border);
+}
 
-@app.route('/dashboard', methods=['GET', 'POST'])
-def dashboard():
-    if 'admin_id' not in session:
-        return redirect(url_for('login'))
-        
-    conn = get_db_connection()
-    
-    if request.method == 'POST':
-        selected_title = request.form.get('task_title')
-        completion_status = request.form.get('completed')
-        
-        conn.execute('UPDATE tasks SET completed = ? WHERE task_title = ?', 
-                     (completion_status, selected_title))
-        conn.commit()
-        flash(f'Successfully updated status for {selected_title}!', 'success')
+h2 {
+    margin-top: 0;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    font-weight: 600;
+}
 
-    tasks = conn.execute('SELECT * FROM tasks').fetchall()
-    conn.close()
-    
-    selected_task_title = request.args.get('task_title', 'task 1')
-    current_task = next((t for t in tasks if t['task_title'] == selected_task_title), None)
-    
-    return render_template('dashboard.html', tasks=tasks, current_task=current_task)
+.form-group {
+    margin-bottom: 20px;
+}
 
-@app.route('/logout')
-def logout():
-    session.pop('admin_id', None)
-    return redirect(url_for('login'))
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
 
-if __name__ == '__main__':
-    app.run(debug=True)
+.task-info-label {
+    font-weight: bold;
+    color: #4b5563;
+    margin-bottom: 10px;
+    background: #f9fafb;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary);
+}
+
+input[type="text"], input[type="password"], select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #4338ca;
+}
+
+.flash-message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+}
+.flash-success { background-color: #def7ec; color: #03543f; }
+.flash-error { background-color: #fde8e8; color: #9b1c1c; }
+
+.logout-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #6b7280;
+    text-decoration: none;
+}
+.logout-link:hover { text-decoration: underline; }
