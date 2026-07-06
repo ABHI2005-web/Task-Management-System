@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-import sqlite3
+import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = 'your_super_secret_session_key'
 
 def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
+    # Replace with your actual MySQL credentials
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="your_password",
+        database="your_database_name"
+    )
     return conn
 
 @app.route('/', methods=['GET', 'POST'])
@@ -16,8 +21,10 @@ def login():
         password = request.form['password']
         
         conn = get_db_connection()
-        admin = conn.execute('SELECT * FROM admins WHERE admin_id = ? AND password = ?', 
-                             (admin_id, password)).fetchone()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM admins WHERE admin_id = %s AND password = %s', (admin_id, password))
+        admin = cursor.fetchone()
+        cursor.close()
         conn.close()
         
         if admin:
@@ -34,17 +41,20 @@ def dashboard():
         return redirect(url_for('login'))
         
     conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
     
     if request.method == 'POST':
         selected_title = request.form.get('task_title')
         completion_status = request.form.get('completed')
         
-        conn.execute('UPDATE tasks SET completed = ? WHERE task_title = ?', 
-                     (completion_status, selected_title))
+        cursor.execute('UPDATE tasks SET completed = %s WHERE task_title = %s', 
+                       (completion_status, selected_title))
         conn.commit()
         flash(f'Successfully updated status for {selected_title}!', 'success')
 
-    tasks = conn.execute('SELECT * FROM tasks').fetchall()
+    cursor.execute('SELECT * FROM tasks')
+    tasks = cursor.fetchall()
+    cursor.close()
     conn.close()
     
     selected_task_title = request.args.get('task_title', 'task 1')
