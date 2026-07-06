@@ -1,37 +1,45 @@
-import sqlite3
+import mysql.connector
 
 def init_db():
-    conn = sqlite3.connect('database.db')
+    # Replace with your actual MySQL database credentials
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="your_password",
+        database="your_database_name"
+    )
     cursor = conn.cursor()
 
     # Admin table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS admins (
-            admin_id TEXT PRIMARY KEY,
-            password TEXT NOT NULL
+            admin_id VARCHAR(255) PRIMARY KEY,
+            password VARCHAR(255) NOT NULL
         )
     ''')
 
-    # Tasks table with Auto-incrementing Primary Key to avoid duplicates
+    # Tasks table (Note: MySQL uses AUTO_INCREMENT)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS tasks (
-            task_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            employee_id TEXT NOT NULL,
-            employee_name TEXT NOT NULL,
-            task_title TEXT NOT NULL,
-            completed TEXT NOT NULL DEFAULT 'false'
+            task_id INT AUTO_INCREMENT PRIMARY KEY,
+            employee_id VARCHAR(255) NOT NULL,
+            employee_name VARCHAR(255) NOT NULL,
+            task_title VARCHAR(255) NOT NULL,
+            completed VARCHAR(50) NOT NULL DEFAULT 'false'
         )
     ''')
 
     # Insert default admin if not exists
-    cursor.execute("INSERT OR IGNORE INTO admins (admin_id, password) VALUES (?, ?)", ('admin', 'admin123'))
+    cursor.execute("SELECT * FROM admins WHERE admin_id = 'admin'")
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO admins (admin_id, password) VALUES (%s, %s)", ('admin', 'admin123'))
     
-    # Seed sample tasks matching your wireframe options
+    # Seed sample tasks if table is empty
     cursor.execute("SELECT COUNT(*) FROM tasks")
     if cursor.fetchone()[0] == 0:
         cursor.executemany('''
             INSERT INTO tasks (employee_id, employee_name, task_title, completed) 
-            VALUES (?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s)
         ''', [
             ('EMP001', 'John Doe', 'task 1', 'false'),
             ('EMP002', 'Jane Smith', 'task 2', 'true'),
@@ -40,7 +48,7 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print("Database initialized successfully.")
+    print("MySQL Database initialized successfully.")
 
 if __name__ == '__main__':
     init_db()
