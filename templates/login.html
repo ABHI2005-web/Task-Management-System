@@ -1,34 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <!-- Basic page settings -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page title -->
     <title>Admin Login - Task Management</title>
+
+    <!-- Connect CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
+
 <body>
+
+    <!-- Main container -->
     <div class="container">
+
+        <!-- Login card -->
         <div class="card">
+
+            <!-- Heading -->
             <h2>Admin Login</h2>
+
+            <!-- Show success or error message -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+
+            <!-- Login form -->
             <form method="POST">
+
+                <!-- Admin ID input -->
                 <div class="form-group">
+
                     <label for="admin_id">Admin ID</label>
-                    <input type="text" id="admin_id" name="admin_id" required placeholder="Enter Admin ID">
+
+                    <input
+                        type="text"
+                        id="admin_id"
+                        name="admin_id"
+                        required
+                        placeholder="Enter Admin ID"
+                    >
+
                 </div>
+
+                <!-- Password input -->
                 <div class="form-group">
+
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="Enter Password">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        placeholder="Enter Password"
+                    >
+
                 </div>
+
+                <!-- Login button -->
                 <button type="submit">Login</button>
+
             </form>
+
         </div>
+
     </div>
+
 </body>
 </html>
