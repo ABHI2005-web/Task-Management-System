@@ -1,7 +1,7 @@
 import mysql.connector
 
 def init_db():
-    # Replace with your actual MySQL database credentials
+    # Replace with your actual MySQL databas credentials
     conn = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -10,7 +10,7 @@ def init_db():
     )
     cursor = conn.cursor()
 
-    # Admin table
+    # Admin tabl
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS admins (
             admin_id VARCHAR(255) PRIMARY KEY,
@@ -18,7 +18,7 @@ def init_db():
         )
     ''')
 
-    # Tasks table (Note: MySQL uses AUTO_INCREMENT)
+    # Tasks table (Note: MySQL uses AUTO-INCREMENT)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS tasks (
             task_id INT AUTO_INCREMENT PRIMARY KEY,
