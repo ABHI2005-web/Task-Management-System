@@ -1,79 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Basic page settings -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page title -->
     <title>Task Management Form</title>
+
+    <!-- Connect CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+<!-- body contains main code -->
 <body>
+
+    <!-- Main container -->
     <div class="container">
+
+        <!-- Card for task form -->
         <div class="card">
+
+            <!-- Heading -->
             <h2>Task Management</h2>
-            
+
+            <!-- Show success or error messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
 
+            <!-- Show Task ID -->
             <div class="task-info-label">
-                task Id: <span id="display-task-id">{{ current_task.task_id if current_task else '' }}</span>
-            </div>
-            <div class="task-info-label">
-                Employee name: <span id="display-emp-name">{{ current_task.employee_name if current_task else '' }}</span> (ID: <span id="display-emp-id">{{ current_task.employee_id if current_task else '' }}</span>)
+                Task ID:
+                <span id="display-task-id">
+                    {{ current_task.task_id if current_task else '' }}
+                </span>
             </div>
 
+            <!-- Show Employee Name and Employee ID -->
+            <div class="task-info-label">
+                Employee Name:
+                <span id="display-emp-name">
+                    {{ current_task.employee_name if current_task else '' }}
+                </span>
+
+                (ID:
+                <span id="display-emp-id">
+                    {{ current_task.employee_id if current_task else '' }}
+                </span>)
+            </div>
+
+            <!-- Form starts -->
             <form method="POST" action="{{ url_for('dashboard') }}">
+
+                <!-- Dropdown for selecting task -->
                 <div class="form-group">
-                    <label for="task_title">task title:</label>
-                    <select id="task_title" name="task_title" onchange="updateTaskDetails(this.value)">
+                    <label for="task_title">Task Title:</label>
+
+                    <select id="task_title"
+                            name="task_title"
+                            onchange="updateTaskDetails(this.value)">
+
+                        <!-- Show all task titles -->
                         {% for task in tasks %}
-                            <option value="{{ task.task_title }}" {% if current_task and task.task_title == current_task.task_title %}selected{% endif %}>
+
+                            <option value="{{ task.task_title }}"
+                                {% if current_task and task.task_title == current_task.task_title %}
+                                    selected
+                                {% endif %}>
+
                                 {{ task.task_title }}
+
                             </option>
+
                         {% endfor %}
+
                     </select>
                 </div>
 
+                <!-- Dropdown for task status -->
                 <div class="form-group">
                     <label for="completed">Completed:</label>
+
                     <select id="completed" name="completed">
-                        <option value="true" {% if current_task and current_task.completed == 'true' %}selected{% endif %}>true</option>
-                        <option value="false" {% if current_task and current_task.completed == 'false' %}selected{% endif %}>false</option>
+
+                        <option value="true"
+                            {% if current_task and current_task.completed == 'true' %}
+                                selected
+                            {% endif %}>
+                            true
+                        </option>
+
+                        <option value="false"
+                            {% if current_task and current_task.completed == 'false' %}
+                                selected
+                            {% endif %}>
+                            false
+                        </option>
+
                     </select>
+
                 </div>
 
+                <!-- Submit button -->
                 <button type="submit">Submit</button>
+
             </form>
 
-            <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+            <!-- Logout link -->
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                Logout
+            </a>
+
         </div>
     </div>
 
     <script>
+
+        // Store task details in JavaScript
         const taskData = {
+
             {% for task in tasks %}
+
                 "{{ task.task_title }}": {
+
                     "id": "{{ task.task_id }}",
                     "emp_name": "{{ task.employee_name }}",
                     "emp_id": "{{ task.employee_id }}",
                     "completed": "{{ task.completed }}"
+
                 },
+
             {% endfor %}
+
         };
 
+        // Update task details when another task is selected
         function updateTaskDetails(title) {
+
+            // Get selected task data
             const data = taskData[title];
+
+            // Check if task exists
             if (data) {
+
+                // Show Task ID
                 document.getElementById('display-task-id').innerText = data.id;
+
+                // Show Employee Name
                 document.getElementById('display-emp-name').innerText = data.emp_name;
+
+                // Show Employee ID
                 document.getElementById('display-emp-id').innerText = data.emp_id;
+
+                // Update completed status
                 document.getElementById('completed').value = data.completed;
             }
         }
+
     </script>
+
 </body>
 </html>
