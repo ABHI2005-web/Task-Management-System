@@ -27,17 +27,19 @@ Make sure you have a running MySQL database instance. Open `app.py` and `init_db
 Ensure you have Flask and the MySQL connector client library installed:
 ```bash
 pip install Flask mysql-connector-python
-3. Initialize the Database
+
+### 3. Initialize the Database
 Before running the application server, execute the initialization script once to construct the data tables and populate initial records:
 
 Bash
 python init_db.py
-4. Launch the Server
+### 4.Launch the Server
 Start the Flask local development container:
 
 Bash
 python app.py
-5. Access the Form
+
+### 5. Access the Form
 Open your web browser and navigate to: http://127.0.0.1:5000
 
 🔐 Preserved Admin Credentials
